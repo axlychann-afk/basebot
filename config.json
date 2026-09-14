@@ -1,0 +1,15 @@
+{
+  "botName": "deuabotz",
+  "ownerName": "deebrayy",
+  "creator": [
+    "628131850918"
+  ],
+  "prefix": [".", "#", "!", "/"],
+  "botMode": "self",
+  "accessDenied": {
+    "owner": "terdeteksi alay",
+    "creator": "terdeteksi gay",
+    "admin": "terdeteksi femboy",
+    "premium": "terdeteksi miskin"
+  }
+}
