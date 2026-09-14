@@ -1,0 +1,134 @@
+import util from 'util'
+import * as baileys from '@whiskeysockets/baileys'
+
+const {
+    default: makeWASocket,
+    proto,
+    generateWAMessageFromContent,
+    generateWAMessage,
+    generateWAMessageContent,
+    prepareWAMessageMedia,
+    downloadContentFromMessage,
+    downloadAndSaveMediaMessage,
+    jidNormalizedUser,
+    getContentType,
+    fetchLatestBaileysVersion,
+    useSingleFileAuthState,
+    makeInMemoryStore,
+    DisconnectReason,
+    Browsers
+} = baileys
+
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
+
+let handler = async (m, {
+    conn,
+    args,
+    text,
+    command,
+    prefix,
+    notifReply
+}) => {
+    try {
+        const code = m.text.slice(2).trim()
+
+        // Jika hanya "=>", jangan jalankan eval
+        if (!code) return
+
+        const isExpression =
+            !/^(const|let|var|if|for|while|do|switch|try|throw|return|class|function|async\s+function)\b/.test(code) &&
+            !/[;{}]\s*$/.test(code)
+
+        const body = isExpression
+            ? `
+                return (${code})
+            `
+            : `
+                ${code}
+            `
+
+        const fn = new AsyncFunction(
+            'conn',
+            'm',
+            'args',
+            'text',
+            'command',
+            'prefix',
+            'notifReply',
+            'baileys',
+            'makeWASocket',
+            'proto',
+            'generateWAMessageFromContent',
+            'generateWAMessage',
+            'generateWAMessageContent',
+            'prepareWAMessageMedia',
+            'downloadContentFromMessage',
+            'downloadAndSaveMediaMessage',
+            'jidNormalizedUser',
+            'getContentType',
+            'fetchLatestBaileysVersion',
+            'useSingleFileAuthState',
+            'makeInMemoryStore',
+            'DisconnectReason',
+            'Browsers',
+            `
+            ${body}
+            `
+        )
+
+        let result = await fn(
+            conn,
+            m,
+            args,
+            text,
+            command,
+            prefix,
+            notifReply,
+            baileys,
+            makeWASocket,
+            proto,
+            generateWAMessageFromContent,
+            generateWAMessage,
+            generateWAMessageContent,
+            prepareWAMessageMedia,
+            downloadContentFromMessage,
+            downloadAndSaveMediaMessage,
+            jidNormalizedUser,
+            getContentType,
+            fetchLatestBaileysVersion,
+            useSingleFileAuthState,
+            makeInMemoryStore,
+            DisconnectReason,
+            Browsers
+        )
+
+        if (result === undefined) return
+
+        if (typeof result !== 'string') {
+            result = util.inspect(result, {
+                depth: null,
+                colors: false
+            })
+        }
+
+        await notifReply(
+            result || 'undefined',
+            'Eval Result'
+        )
+
+    } catch (e) {
+        await notifReply(
+            util.inspect(e, {
+                depth: null,
+                colors: false
+            }),
+            'Eval Error'
+        )
+    }
+}
+
+handler.customPrefix = /^=>/
+handler.command = new RegExp()
+handler.owner = true
+
+export default handler
